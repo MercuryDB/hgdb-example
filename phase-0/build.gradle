@@ -1,21 +1,16 @@
 /* 
  * Default MercuryDB example build. Feel free to reuse this
  * for other projects. It should be as simple as changing the below
- * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names
+ * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
+ * 
+ * This build file assumes a default gradle java project structure.
  */
 
 project.ext.set('hgSchemaPackage', 'examples.schema')
 project.ext.set('hgDbPackage', 'examples.db')
 
-apply plugin: 'java'
-
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile fileTree(dir: 'external-libs', include: '*.jar')
+    compile fileTree(dir: '../external-libs', include: '*.jar')
 }
 
 task clearDB(type: Delete) {
