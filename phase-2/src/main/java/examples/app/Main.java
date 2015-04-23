@@ -30,7 +30,7 @@ public class Main {
         // ===========================
 
         //  Query all people with ages >= 21
-        System.out.println("\nages >= 21:");
+        System.out.println("\nages >= 1:");
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
         stream.forEachRemaining(System.out::println);
 
