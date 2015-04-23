@@ -3,16 +3,16 @@ package examples.schema;
 public class Person {
     private String name;
     private int age;
-    private boolean sex; // female is true, male is false
+    private boolean gender; // female is true, male is false
 
-    public Person(String name, int age, boolean sex) {
+    public Person(String name, int age, boolean gender) {
         this.name = name;
         this.age = age;
-        this.sex = sex;
+        this.gender = gender;
     }
 
     public String toString() {
-        return String.format("{name=%s, age=%d, sex=%s}",
-                name, age, sex ? "female" : "male");
+        return String.format("{name=%s, age=%d, gender=%s}",
+                name, age, gender ? "female" : "male");
     }
 }

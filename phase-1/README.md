@@ -26,6 +26,8 @@ MercuryDB features we see in this phase are:
 
 * The `HgStream` class and creating streams of the rows in a table
 
+* Using the Java 8 Stream API to interact with `HgStream`s
+
 * The `HgRelation` class and comparing fields of objects in the database
 
 * The `TableID` class and creating table aliases for self-joins
