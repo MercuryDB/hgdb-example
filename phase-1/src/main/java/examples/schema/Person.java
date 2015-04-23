@@ -1,5 +1,6 @@
 package examples.schema;
 
+import org.mercurydb.annotations.HgUpdate;
 import org.mercurydb.annotations.HgValue;
 
 public class Person {
@@ -35,6 +36,13 @@ public class Person {
         } else {
             return Gender.FEMALE;
         }
+    }
+    
+    @HgUpdate({"name", "age", "gender"})
+    public void copyFrom(Person o) {
+    	this.name = o.name;
+    	this.age = o.age;
+    	this.sex = o.sex;
     }
 
     public enum Gender {

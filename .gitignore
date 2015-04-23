@@ -4,3 +4,8 @@
 build/
 db/
 *.iml
+.classpath
+.project
+.settings/
+.gitignore
+*.bak
