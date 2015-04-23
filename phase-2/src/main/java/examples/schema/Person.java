@@ -1,9 +1,7 @@
 package examples.schema;
 
-import org.mercurydb.annotations.HgUpdate;
 import org.mercurydb.annotations.HgValue;
 import org.mercurydb.annotations.HgUpdate;
-import org.mercurydb.annotations.HgIndexStyle;
 
 public class Person {
     private String name;
@@ -21,7 +19,7 @@ public class Person {
                 name, age, gender ? "female" : "male");
     }
 
-    @HgValue(value = "name", index = HgIndexStyle.ORDERED)
+    @HgValue("name")
     public String getName() {
         return name;
     }
@@ -31,7 +29,7 @@ public class Person {
         this.name = name;
     }
 
-    @HgValue(value = "age", index = HgIndexStyle.ORDERED)
+    @HgValue("age")
     public int getAge() {
         return age;
     }
@@ -41,7 +39,7 @@ public class Person {
         this.age = age;
     }
 
-    @HgValue(value = "gender", index = HgIndexStyle.UNORDERED)
+    @HgValue("gender")
     public Gender getGender() {
         if (gender) {
             return Gender.FEMALE;
@@ -63,12 +61,20 @@ public class Person {
                 break;
         }
     }
-    
-    @HgUpdate({"name", "age", "gender"})
-    public void copyFrom(Person o) {
-    	this.name = o.name;
-    	this.age = o.age;
-    	this.sex = o.sex;
+
+    @HgValue("canDrink")
+    public boolean canDrink() {
+        return age >= 21;
+    }
+
+    @HgValue("canSmoke")
+    public boolean canSmoke() {
+        return age >= 18;
+    }
+
+    @HgUpdate({"age", "canDrink", "canSmoke"})
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public enum Gender {

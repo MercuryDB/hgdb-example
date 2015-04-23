@@ -30,7 +30,7 @@ public class Main {
         // ===========================
 
         //  Query all people with ages >= 21
-        System.out.println("\nages >= 21:");
+        System.out.println("\nages >= 1:");
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
         stream.forEachRemaining(System.out::println);
 
@@ -43,12 +43,12 @@ public class Main {
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.lt.age(23))
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
         // Query all people whose age is divisible by 2
         System.out.println("\nage % 2 == 0:");
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
 
         // ==========
@@ -64,6 +64,6 @@ public class Main {
                 PersonTable.as(PersonTable.ID).on.age(),
                 PersonTable.as(PERSON_ALIAS).on.age(),
                 HgRelation.LT)
-            .forEachRemaining(System.out::println);
+        .forEachRemaining(System.out::println);
     }
 }
