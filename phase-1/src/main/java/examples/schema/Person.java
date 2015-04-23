@@ -14,7 +14,8 @@ public class Person {
     }
 
     public String toString() {
-        return String.format("{name=%s, age=%d, sex=%b}", name, age, sex);
+        return String.format("{name=%s, age=%d, sex=%s}",
+                name, age, sex ? "male" : "female");
     }
 
     @HgValue("name")
@@ -40,9 +41,5 @@ public class Person {
         MALE,
         FEMALE,
         OTHER
-
     }
-
-
-
 }
