@@ -9,6 +9,9 @@
 project.ext.set('hgSchemaPackage', 'examples.schema')
 project.ext.set('hgDbPackage', 'examples.db')
 
+apply plugin: 'application'
+mainClassName = "examples.app.Main"
+
 dependencies {
     compile fileTree(dir: '../external-libs', include: '*.jar')
 }
@@ -57,3 +60,4 @@ compileTables.dependsOn generateTables
 insertHooks.dependsOn compileTables
 assemble.dependsOn insertHooks
 compileTestJava.dependsOn insertHooks
+run.dependsOn insertHooks
