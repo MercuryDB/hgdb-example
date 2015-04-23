@@ -5,7 +5,7 @@ import org.mercurydb.annotations.HgValue;
 public class Person {
     private String name;
     private int age;
-    private boolean sex; // male is true, female is false
+    private boolean sex; // female is true, male is false
 
     public Person(String name, int age, boolean sex) {
         this.name = name;
@@ -15,7 +15,7 @@ public class Person {
 
     public String toString() {
         return String.format("{name=%s, age=%d, sex=%s}",
-                name, age, sex ? "male" : "female");
+                name, age, sex ? "female" : "male");
     }
 
     @HgValue("name")
@@ -31,9 +31,9 @@ public class Person {
     @HgValue("gender")
     public Gender getSex() {
         if (sex) {
-            return Gender.MALE;
-        } else {
             return Gender.FEMALE;
+        } else {
+            return Gender.MALE;
         }
     }
 
