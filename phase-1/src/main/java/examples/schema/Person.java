@@ -2,6 +2,7 @@ package examples.schema;
 
 import org.mercurydb.annotations.HgValue;
 import org.mercurydb.annotations.HgUpdate;
+import org.mercurydb.annotations.HgIndexStyle;
 
 public class Person {
     private String name;
@@ -19,7 +20,7 @@ public class Person {
                 name, age, gender ? "female" : "male");
     }
 
-    @HgValue("name")
+    @HgValue(value = "name", index = HgIndexStyle.ORDERED)
     public String getName() {
         return name;
     }
@@ -29,7 +30,7 @@ public class Person {
         this.name = name;
     }
 
-    @HgValue("age")
+    @HgValue(value = "age", index = HgIndexStyle.ORDERED)
     public int getAge() {
         return age;
     }
@@ -39,7 +40,7 @@ public class Person {
         this.age = age;
     }
 
-    @HgValue("gender")
+    @HgValue(value = "gender", index = HgIndexStyle.UNORDERED)
     public Gender getGender() {
         if (gender) {
             return Gender.FEMALE;
