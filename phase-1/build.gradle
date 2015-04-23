@@ -1,8 +1,8 @@
-/* 
+/*
  * Default MercuryDB example build. Feel free to reuse this
  * for other projects. It should be as simple as changing the below
  * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
- * 
+ *
  * This build file assumes a default gradle java project structure.
  */
 
@@ -26,7 +26,7 @@ dependencies {
 }
 
 task clearDB(type: Delete) {
-    delete 'src/main/java/' + hgDbPackage.replace('.', '/') 
+    delete 'src/main/java/' + hgDbPackage.replace('.', '/')
 }
 
 task generateTables(type: JavaExec) {
@@ -42,10 +42,10 @@ task generateTables(type: JavaExec) {
 task compileTables(type: JavaCompile) {
     classpath = sourceSets.main.compileClasspath
     source = sourceSets.main.java.srcDirs
-    destinationDir = sourceSets.main.output.classesDir 
+    destinationDir = sourceSets.main.output.classesDir
 }
 
-task insertHooks(type: JavaExec) { 
+task insertHooks(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'org.mercurydb.Main'
     args = [
