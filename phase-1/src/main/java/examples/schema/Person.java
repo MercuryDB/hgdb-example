@@ -68,7 +68,7 @@ public class Person {
     public void copyFrom(Person o) {
     	this.name = o.name;
     	this.age = o.age;
-    	this.sex = o.sex;
+    	this.gender = o.gender;
     }
 
     public enum Gender {

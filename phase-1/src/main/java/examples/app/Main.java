@@ -22,7 +22,7 @@ public class Main {
                 new Person("Doug Ilijev", 24, false),
         };
 
-        System.out.println("The Database:");
+        System.out.println("\nThe Database:");
         PersonTable.stream().forEach(System.out::println);
 
         // ===========================
@@ -65,5 +65,19 @@ public class Main {
                 PersonTable.as(PERSON_ALIAS).on.age(),
                 HgRelation.LT)
             .forEachRemaining(System.out::println);
+
+        // Great! Everybody had a birthday recently!
+        for (Person p : people) {
+            p.setAge(p.getAge()+1);
+        }
+
+        // Query all people that are male and less than 23
+        System.out.println("\nmale and age < 23:");
+        HgDB.query(
+                PersonTable.eq.gender(Person.Gender.MALE),
+                PersonTable.lt.age(24))
+            .forEachRemaining(System.out::println);
+
+
     }
 }
