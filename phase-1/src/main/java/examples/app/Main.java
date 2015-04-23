@@ -7,25 +7,19 @@ import org.mercurydb.queryutils.HgRelation;
 import org.mercurydb.queryutils.HgStream;
 import org.mercurydb.queryutils.TableID;
 
-/**
- * Phase 1 of Gradle People example. Can be ran by running "gradle run"
- *
- * Created 4/22/2015
- */
 public class Main {
 
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();
 
     public static void main(String[] args) {
-
         // Our nice little database. The constructor bytecode hooks will insert the
         // people into the database!
 
         Person[] people = {
-                new Person("John Doe", 20, true),
-                new Person("Rhianne Styles", 21, false),
-                new Person("Cole Stewart", 23, true),
-                new Person("Doug Ilijev", 24, true),
+                new Person("John Doe", 17, false),
+                new Person("Rhianne Styles", 19, true),
+                new Person("Cole Stewart", 23, false),
+                new Person("Doug Ilijev", 24, false),
         };
 
         System.out.println("The Database:");
