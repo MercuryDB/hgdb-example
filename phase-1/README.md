@@ -16,10 +16,12 @@ hooks.
 
 MercuryDB features we see in this phase are:
 
-* The `@HgValue` annotation
+* The `@HgValue` and `@HgUpdate` annotations
 
-* Using `@HgValue` and public methods to create a representation of internal
+* Using `@HgValue` on public methods to create a representation of internal
   fields as database table **values**
+
+* Using methods marked `@HgUpdate` to update internal state and indexes
 
 * The `HgDB` class and the `query` and `join` methods, which are the main
   interface to the database logic in *MercuryDB* applications

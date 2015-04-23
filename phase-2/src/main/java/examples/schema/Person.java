@@ -24,9 +24,19 @@ public class Person {
         return name;
     }
 
+    @HgUpdate("name")
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @HgValue("age")
     public int getAge() {
         return age;
+    }
+
+    @HgUpdate("age")
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @HgValue("gender")
@@ -37,22 +47,36 @@ public class Person {
             return Gender.MALE;
         }
     }
-    
+
+    @HgUpdate("gender")
+    public void setGender(Gender gender) {
+        switch (gender) {
+            case MALE:
+                this.gender = false;
+                break;
+            case FEMALE:
+                this.gender = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     @HgValue("canDrink")
     public boolean canDrink() {
         return age >= 21;
     }
-    
+
     @HgValue("canSmoke")
     public boolean canSmoke() {
         return age >= 18;
     }
-    
+
     @HgUpdate({"age", "canDrink", "canSmoke"})
     public void setAge(int age) {
         this.age = age;
     }
-    
+
     public enum Gender {
         MALE,
         FEMALE,

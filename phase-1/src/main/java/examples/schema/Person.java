@@ -1,6 +1,7 @@
 package examples.schema;
 
 import org.mercurydb.annotations.HgValue;
+import org.mercurydb.annotations.HgUpdate;
 
 public class Person {
     private String name;
@@ -23,9 +24,19 @@ public class Person {
         return name;
     }
 
+    @HgUpdate("name")
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @HgValue("age")
     public int getAge() {
         return age;
+    }
+
+    @HgUpdate("age")
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @HgValue("gender")
@@ -34,6 +45,20 @@ public class Person {
             return Gender.FEMALE;
         } else {
             return Gender.MALE;
+        }
+    }
+
+    @HgUpdate("gender")
+    public void setGender(Gender gender) {
+        switch (gender) {
+            case MALE:
+                this.gender = false;
+                break;
+            case FEMALE:
+                this.gender = true;
+                break;
+            default:
+                break;
         }
     }
 
