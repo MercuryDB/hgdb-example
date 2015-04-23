@@ -1,5 +1,8 @@
 allprojects {
     apply plugin: 'java'
+    
+    apply plugin: 'application'
+    mainClassName = "examples.app.Main"
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8

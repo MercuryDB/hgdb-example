@@ -15,7 +15,6 @@ public class Main {
         };
 
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
-
-
+        stream.forEachRemaining(System.out::println);
     }
 }

@@ -65,3 +65,4 @@ compileTables.dependsOn generateTables
 insertHooks.dependsOn compileTables
 assemble.dependsOn insertHooks
 compileTestJava.dependsOn insertHooks
+run.dependsOn insertHooks
