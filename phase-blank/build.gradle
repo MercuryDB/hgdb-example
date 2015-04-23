@@ -1,1 +1,71 @@
-../build.gradle.template
+/* 
+ * Default MercuryDB example build. Feel free to reuse this
+ * for other projects. It should be as simple as changing the below
+ * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
+ * 
+ * This build file assumes a default gradle java project structure.
+ */
+
+apply plugin: 'application'
+mainClassName = "examples.app.Main"
+
+project.ext.set('hgSchemaPackage', 'examples.schema')
+project.ext.set('hgDbPackage', 'examples.db')
+project.ext.set('hgAppPackage', 'examples.app')
+
+sourceSets {
+    main {
+        java {
+            exclude hgAppPackage.replace('.', '/') + '/**'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: '../external-libs', include: '*.jar')
+}
+
+task clearDB(type: Delete) {
+    delete 'src/main/java/' + hgDbPackage.replace('.', '/') 
+}
+
+task generateTables(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.mercurydb.Main'
+    args = [
+        '-src', project.hgSchemaPackage,
+        '-db', project.hgDbPackage,
+        '-root', 'src/main/java'
+    ]
+}
+
+task compileTables(type: JavaCompile) {
+    classpath = sourceSets.main.compileClasspath
+    source = sourceSets.main.java.srcDirs
+    destinationDir = sourceSets.main.output.classesDir 
+}
+
+task insertHooks(type: JavaExec) { 
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.mercurydb.Main'
+    args = [
+        '-src', project.hgSchemaPackage,
+        '-db', project.hgDbPackage,
+        '-root', 'src/main/java',
+        '-ih', sourceSets.main.output.classesDir
+    ]
+}
+
+task newJar(type: Jar) {
+    from sourceSets.main.output
+}
+
+clean.dependsOn clearDB
+
+classes.dependsOn clearDB
+generateTables.dependsOn classes
+compileTables.dependsOn generateTables
+insertHooks.dependsOn compileTables
+assemble.dependsOn insertHooks
+compileTestJava.dependsOn insertHooks
+run.dependsOn insertHooks
