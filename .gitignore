@@ -4,3 +4,6 @@
 build/
 db/
 *.iml
+*.swp
+*~
+~*
