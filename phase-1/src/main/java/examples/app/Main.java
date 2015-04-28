@@ -8,7 +8,6 @@ import org.mercurydb.queryutils.HgStream;
 import org.mercurydb.queryutils.TableID;
 
 public class Main {
-
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();
 
     public static void main(String[] args) {
@@ -50,7 +49,6 @@ public class Main {
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
             .forEachRemaining(System.out::println);
 
-
         // ==========
         // Self Joins
         // ==========
@@ -77,7 +75,5 @@ public class Main {
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.lt.age(24))
             .forEachRemaining(System.out::println);
-
-
     }
 }
