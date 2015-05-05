@@ -6,6 +6,16 @@ allprojects {
     targetCompatibility = 1.8
 }
 
+repositories {
+    maven {
+        url 'https://dl.dropboxusercontent.com/u/40569306/mvn-repository/'
+    }
+}
+
+dependencies {
+    compile 'org.mercurydb:mercurydb:+'    
+}
+
 task(pushBuildTemplate, type: Copy) {
     from(file('build.gradle.template'))
     into 'phase-blank/'

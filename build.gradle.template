@@ -46,10 +46,6 @@ configurations {
 project.run.classpath += sourceSets.schema.output
 project.run.classpath += sourceSets.db.output
 
-dependencies {
-    compile files('../external-libs/mercurydb-all.jar')
-}
-
 task clearDB(type: Delete) {
     delete 'src/db/java/' + hgDbPackage.replace('.', '/')
 }
