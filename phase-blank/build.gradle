@@ -14,15 +14,30 @@ project.ext.set('hgDbPackage', 'examples.db')
 project.ext.set('hgAppPackage', 'examples.app')
 
 sourceSets {
+    schema {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.compileClasspath
+    }
+    db {
+        compileClasspath += main.compileClasspath
+        compileClasspath += schema.output 
+    }
     main {
-        java {
-            exclude hgAppPackage.replace('.', '/') + '/**'
-        }
+        compileClasspath += schema.output
+        compileClasspath += db.output
     }
 }
 
+configurations {
+    schemaCompile.extendsFrom mainCompile
+    dbCompile.extendsFrom mainCompile
+}
+
+project.run.classpath += sourceSets.schema.output
+project.run.classpath += sourceSets.db.output
+
 dependencies {
-    compile fileTree(dir: '../external-libs', include: '*.jar')
+    compile files('../external-libs/mercurydb-all.jar')
 }
 
 task clearDB(type: Delete) {
@@ -30,20 +45,21 @@ task clearDB(type: Delete) {
 }
 
 task generateTables(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.schema.runtimeClasspath
     main = 'org.mercurydb.Main'
     args = [
         '-src', project.hgSchemaPackage,
         '-db', project.hgDbPackage,
-        '-root', 'src/main/java'
+        '-root', 'src/schema/java',
+        '-dbdir', 'src/db/java'
     ]
 }
 
-task compileTables(type: JavaCompile) {
-    classpath = sourceSets.main.compileClasspath
-    source = sourceSets.main.java.srcDirs
-    destinationDir = sourceSets.main.output.classesDir
-}
+//task compileTables(type: JavaCompile) {
+//    classpath = sourceSets.main.compileClasspath
+//    source = 'src/main/db'
+//    destinationDir = sourceSets.main.output.classesDir
+//}
 
 task insertHooks(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
@@ -51,8 +67,8 @@ task insertHooks(type: JavaExec) {
     args = [
         '-src', project.hgSchemaPackage,
         '-db', project.hgDbPackage,
-        '-root', 'src/main/java',
-        '-ih', sourceSets.main.output.classesDir
+        '-root', 'src/schema/java',
+        '-ih', sourceSets.schema.output.classesDir
     ]
 }
 
@@ -60,12 +76,15 @@ task newJar(type: Jar) {
     from sourceSets.main.output
 }
 
-clean.dependsOn clearDB
+generateTables.dependsOn compileSchemaJava
+compileDbJava.dependsOn generateTables
+insertHooks.dependsOn compileSchemaJava
 
-classes.dependsOn clearDB
-generateTables.dependsOn classes
-compileTables.dependsOn generateTables
-insertHooks.dependsOn compileTables
-assemble.dependsOn insertHooks
-compileTestJava.dependsOn insertHooks
-run.dependsOn insertHooks
+clean.dependsOn clearDB
+//classes.dependsOn clearDB
+//generateTables.dependsOn classes
+//compileTables.dependsOn generateTables
+//insertHooks.dependsOn compileTables
+//assemble.dependsOn insertHooks
+//compileTestJava.dependsOn insertHooks
+//run.dependsOn insertHooks

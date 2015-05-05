@@ -34,11 +34,6 @@ public class Person {
         return age;
     }
 
-    @HgUpdate("age")
-    public void setAge(int age) {
-        this.age = age;
-    }
-
     @HgValue("gender")
     public Gender getGender() {
         if (gender) {

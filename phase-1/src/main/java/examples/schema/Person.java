@@ -63,7 +63,7 @@ public class Person {
                 break;
         }
     }
-    
+
     @HgUpdate({"name", "age", "gender"})
     public void copyFrom(Person o) {
     	this.name = o.name;
