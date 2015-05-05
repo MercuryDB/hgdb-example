@@ -73,7 +73,7 @@ task generateTables(type: JavaExec) {
 }
 
 task insertHooks(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.main.compileClasspath
     main = 'org.mercurydb.Main'
     args = [
         '-src', project.hgSchemaPackage,
@@ -86,5 +86,6 @@ task insertHooks(type: JavaExec) {
 // Gradle Graph for tasks below
 generateTables.dependsOn compileSchemaJava
 compileDbJava.dependsOn generateTables
-insertHooks.dependsOn compileSchemaJava
+insertHooks.dependsOn compileDbJava
+compileJava.dependsOn insertHooks
 clean.dependsOn clearDB
