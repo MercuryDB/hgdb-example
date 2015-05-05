@@ -3,15 +3,25 @@
  * for other projects. It should be as simple as changing the below
  * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
  *
- * This build file assumes a default gradle java project structure.
+ * This build file contains 3 Gradle source sets.
+ *  - main (app)
+ *  - db
+ *  - schema
+ *
+ * The main source set contains the app code.
+ * The main package is examples.app (project.hgAppPackage)
+ * The schema source set contains the database schema.
+ * The schema package is examples.schema (project.hgSchemaPackage)
+ * The db source set contains the generated tables from the schema.
+ * The db package is examples.db (project.hgDbPackage)
  */
-
-apply plugin: 'application'
-mainClassName = "examples.app.Main"
 
 project.ext.set('hgSchemaPackage', 'examples.schema')
 project.ext.set('hgDbPackage', 'examples.db')
 project.ext.set('hgAppPackage', 'examples.app')
+
+apply plugin: 'application'
+mainClassName = "examples.app.Main"
 
 sourceSets {
     schema {
@@ -41,7 +51,7 @@ dependencies {
 }
 
 task clearDB(type: Delete) {
-    delete 'src/main/java/' + hgDbPackage.replace('.', '/')
+    delete 'src/db/java/' + hgDbPackage.replace('.', '/')
 }
 
 task generateTables(type: JavaExec) {
@@ -55,12 +65,6 @@ task generateTables(type: JavaExec) {
     ]
 }
 
-//task compileTables(type: JavaCompile) {
-//    classpath = sourceSets.main.compileClasspath
-//    source = 'src/main/db'
-//    destinationDir = sourceSets.main.output.classesDir
-//}
-
 task insertHooks(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'org.mercurydb.Main'
@@ -72,19 +76,8 @@ task insertHooks(type: JavaExec) {
     ]
 }
 
-task newJar(type: Jar) {
-    from sourceSets.main.output
-}
-
+// Gradle Graph for tasks below
 generateTables.dependsOn compileSchemaJava
 compileDbJava.dependsOn generateTables
 insertHooks.dependsOn compileSchemaJava
-
 clean.dependsOn clearDB
-//classes.dependsOn clearDB
-//generateTables.dependsOn classes
-//compileTables.dependsOn generateTables
-//insertHooks.dependsOn compileTables
-//assemble.dependsOn insertHooks
-//compileTestJava.dependsOn insertHooks
-//run.dependsOn insertHooks
