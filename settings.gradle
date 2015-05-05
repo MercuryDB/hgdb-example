@@ -1,4 +1,3 @@
-include 'phase-blank'
 include 'phase-0'
 include 'phase-1'
 include 'phase-2'
