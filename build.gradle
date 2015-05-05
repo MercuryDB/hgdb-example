@@ -8,6 +8,7 @@ allprojects {
 
 task(pushBuildTemplate, type: Copy) {
     from(file('build.gradle.template'))
+    into 'phase-blank/'
     into 'phase-0/'
     into 'phase-1/'
     into 'phase-2/'
