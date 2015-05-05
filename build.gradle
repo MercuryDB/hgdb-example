@@ -6,20 +6,16 @@ allprojects {
     targetCompatibility = 1.8
 }
 
-repositories {
-    maven {
-        url 'https://dl.dropboxusercontent.com/u/40569306/mvn-repository/'
+def filesToCopy = copySpec {
+    from 'build.gradle.template'
+    rename { 'build.gradle' }
+}
+
+task pushBuildTemplate(type: Copy) {
+    ['phase-blank', 'phase-0', 'phase-1', 'phase-2'].each { dest ->
+        copy {
+            with filesToCopy
+            into dest
+        }
     }
-}
-
-dependencies {
-    compile 'org.mercurydb:mercurydb:+'    
-}
-
-task(pushBuildTemplate, type: Copy) {
-    from(file('build.gradle.template'))
-    into 'phase-blank/'
-    into 'phase-0/'
-    into 'phase-1/'
-    into 'phase-2/'
 }

@@ -23,6 +23,17 @@ project.ext.set('hgAppPackage', 'examples.app')
 apply plugin: 'application'
 mainClassName = "examples.app.Main"
 
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://dl.dropboxusercontent.com/u/40569306/mvn-repository'
+    }
+}
+
+dependencies {
+    compile 'org.mercurydb:mercurydb:+'
+}
+
 sourceSets {
     schema {
         compileClasspath += main.compileClasspath
