@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.mercurydb:mercurydb:+'
+    compile 'com.github.mercurydb:mercurydb:+'
 }
 
 sourceSets {
