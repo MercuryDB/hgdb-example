@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.mercurydb:mercurydb:+'
+    compile 'com.github.mercurydb:mercurydb:0.6.21'
 }
 
 sourceSets {
@@ -63,7 +63,7 @@ task clearDB(type: Delete) {
 
 task generateTables(type: JavaExec) {
     classpath = sourceSets.schema.runtimeClasspath
-    main = 'org.mercurydb.Main'
+    main = 'com.github.mercurydb.Main'
     args = [
         '-src', project.hgSchemaPackage,
         '-db', project.hgDbPackage,
@@ -74,7 +74,7 @@ task generateTables(type: JavaExec) {
 
 task insertHooks(type: JavaExec) {
     classpath = sourceSets.main.compileClasspath
-    main = 'org.mercurydb.Main'
+    main = 'com.github.mercurydb.Main'
     args = [
         '-src', project.hgSchemaPackage,
         '-db', project.hgDbPackage,

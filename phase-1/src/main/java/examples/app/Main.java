@@ -1,11 +1,12 @@
 package examples.app;
 
-import examples.db.PersonTable;
+import com.github.mercurydb.queryutils.HgDB;
+import com.github.mercurydb.queryutils.HgRelation;
+import com.github.mercurydb.queryutils.HgStream;
+import com.github.mercurydb.queryutils.TableID;
+
 import examples.schema.Person;
-import org.mercurydb.queryutils.HgDB;
-import org.mercurydb.queryutils.HgRelation;
-import org.mercurydb.queryutils.HgStream;
-import org.mercurydb.queryutils.TableID;
+import examples.db.PersonTable;
 
 public class Main {
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();

@@ -1,7 +1,7 @@
 package examples.schema;
 
-import org.mercurydb.annotations.HgValue;
-import org.mercurydb.annotations.HgUpdate;
+import com.github.mercurydb.annotations.HgUpdate;
+import com.github.mercurydb.annotations.HgValue;
 
 public class Person {
     private String name;

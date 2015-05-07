@@ -1,11 +1,12 @@
 package examples.app;
 
+import com.github.mercurydb.queryutils.HgDB;
+import com.github.mercurydb.queryutils.HgRelation;
+import com.github.mercurydb.queryutils.HgStream;
+import com.github.mercurydb.queryutils.TableID;
+
 import examples.db.PersonTable;
 import examples.schema.Person;
-import org.mercurydb.queryutils.HgDB;
-import org.mercurydb.queryutils.HgRelation;
-import org.mercurydb.queryutils.HgStream;
-import org.mercurydb.queryutils.TableID;
 
 public class Main {
 
