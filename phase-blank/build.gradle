@@ -25,13 +25,10 @@ mainClassName = "examples.app.Main"
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://dl.dropboxusercontent.com/u/40569306/mvn-repository'
-    }
 }
 
 dependencies {
-    compile 'com.github.mercurydb:mercurydb:0.6.21'
+    compile 'com.github.mercurydb:mercurydb:0.6.2'
 }
 
 sourceSets {
