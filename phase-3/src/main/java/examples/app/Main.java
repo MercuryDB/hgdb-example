@@ -114,10 +114,4 @@ public class Main {
         Person mathewStuart = new Person("Mathew Stuart", "12/12/2000", false);
         new Family(carrieMarven, loganStuart, mathewStuart);
     }
-
-    private static void setParents(Person mother, Person father, Person... children) {
-        for (Person p : children) {
-            new Family(mother, father, p);
-        }
-    }
 }
