@@ -14,9 +14,9 @@ public class Employee extends Person {
     private double salary;
 
     public Employee(
-                String name, int age, boolean gender, Person mother, Person father,
+                Person person,
                 Department department, String email, String location, double salary) {
-        super(name, age, gender, mother, father);
+        super(person);
         this.department = department;
         this.email = email;
         this.location = location;
@@ -24,7 +24,7 @@ public class Employee extends Person {
     }
 
     @HgValue("department")
-    public Department getDepartment() {
+    public Department getPrimaryDepartment() {
         return department;
     }
 

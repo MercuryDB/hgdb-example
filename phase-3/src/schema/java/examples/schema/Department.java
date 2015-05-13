@@ -1,5 +1,6 @@
 package examples.schema;
 
+import com.github.mercurydb.annotations.HgUpdate;
 import com.github.mercurydb.annotations.HgValue;
 
 /**
@@ -9,9 +10,8 @@ public class Department {
     private String name;
     private Employee manager;
 
-    public Department(String name, Employee manager) {
+    public Department(String name) {
         this.name = name;
-        this.manager = manager;
     }
 
     @HgValue("name")
@@ -22,5 +22,10 @@ public class Department {
     @HgValue("manager")
     public Employee getManager() {
         return manager;
+    }
+
+    @HgUpdate({"manager"})
+    public void setManager(Employee manager) {
+        this.manager = manager;
     }
 }

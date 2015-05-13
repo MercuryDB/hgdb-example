@@ -28,7 +28,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.mercurydb:mercurydb:0.6.2'
+    // compile 'com.github.mercurydb:mercurydb:0.6.2'
+    compile files('/Users/colestewart/Development/repos/mercurydb/mercurydb/build/libs/mercurydb-all-0.6.3-SNAPSHOT.jar')
 }
 
 sourceSets {

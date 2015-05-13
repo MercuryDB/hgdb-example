@@ -1,27 +1,43 @@
 package examples.schema;
 
+import com.github.mercurydb.annotations.HgIndexStyle;
 import com.github.mercurydb.annotations.HgUpdate;
 import com.github.mercurydb.annotations.HgValue;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class Person {
     private String name;
-    private int age;
+    private Date birthday;
     private boolean gender; // female is true, male is false
 
-    private Person mother;
-    private Person father;
+    public Person(Person person) {
+        this(person.name, person.birthday, person.gender);
+    }
 
-    public Person(String name, int age, boolean gender, Person mother, Person father) {
+    public Person(String name, String birthday, boolean gender) {
         this.name = name;
-        this.age = age;
+        try {
+            this.birthday = new SimpleDateFormat("MM/dd/yyyy").parse(birthday);
+        } catch (ParseException e) {
+            System.err.println("Invalid date! Must follow format of MM/dd/yyyy");
+        }
         this.gender = gender;
-        this.mother = mother;
-        this.father = father;
+    }
+
+    public Person(String name, Date birthday, boolean gender) {
+        this.name = name;
+        this.birthday = birthday;
+        this.gender = gender;
     }
 
     public String toString() {
-        return String.format("{name=%s, age=%d, gender=%s}",
-                name, age, gender ? "female" : "male");
+        return String.format("{name=%s, birthday=%d, gender=%s}",
+                name, birthday, gender ? "female" : "male");
     }
 
     @HgValue("name")
@@ -34,19 +50,20 @@ public class Person {
         this.name = name;
     }
 
-    @HgValue("age")
+    @HgValue(value="age", index= HgIndexStyle.ORDERED)
     public int getAge() {
-        return age;
+        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(today);
+        int yearNow = cal.get(Calendar.YEAR);
+        cal.setTime(birthday);
+        int yearThen = cal.get(Calendar.YEAR);
+        return yearNow - yearThen;
     }
 
-    @HgValue("mother")
-    public Person getMother() {
-        return mother;
-    }
-
-    @HgValue("father")
-    public Person getFather() {
-        return father;
+    @HgValue("birthday")
+    public Date getBirthday() {
+        return birthday;
     }
 
     @HgValue("gender")
@@ -74,17 +91,12 @@ public class Person {
 
     @HgValue("canDrink")
     public boolean canDrink() {
-        return age >= 21;
+        return getAge() >= 21;
     }
 
     @HgValue("canSmoke")
     public boolean canSmoke() {
-        return age >= 18;
-    }
-
-    @HgUpdate({"age", "canDrink", "canSmoke"})
-    public void setAge(int age) {
-        this.age = age;
+        return getAge() >= 18;
     }
 
     public enum Gender {
