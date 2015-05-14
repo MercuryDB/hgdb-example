@@ -1,9 +1,7 @@
 package examples.app;
 
-import com.github.mercurydb.queryutils.HgDB;
-import com.github.mercurydb.queryutils.HgRelation;
-import com.github.mercurydb.queryutils.HgStream;
-import com.github.mercurydb.queryutils.TableID;
+import com.github.mercurydb.queryutils.*;
+import examples.db.FamilyTable;
 import examples.db.PersonTable;
 import examples.schema.Department;
 import examples.schema.Family;
@@ -11,12 +9,11 @@ import examples.schema.Person;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Calendar;
 
 public class Main {
 
     public static final TableID<Person> PERSON_ALIAS = TableID.createName();
-    public static final TableID<Family> FAMILY_ALIAS = TableID.createName();
+    public static final TableID<Family> FAMILY_ALIAS_0 = TableID.createName();
 
     public static void main(String[] args) {
         buildSampleDatabase();
@@ -67,8 +64,6 @@ public class Main {
 
         // Query all people with the same birthday month
         System.out.println("\np1.birthday.month == p2.birthday.month");
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
         HgDB.join(
                 PersonTable.on.birthday(),
                 PersonTable.as(PERSON_ALIAS).on.birthday(),
@@ -80,6 +75,37 @@ public class Main {
                 .forEachRemaining(System.out::println);
 
         // Query pairs (p1, p2) of all people p1 is grandfather of p2
+        System.out.println("\np1 == grandson of p2");
+        HgDB.join(
+                FamilyTable.as(FamilyTable.ID).on.father(),
+                FamilyTable.as(FAMILY_ALIAS_0).on.children(),
+                HgRelation.IN
+        ).forEachRemaining(t -> {
+            Family f1 = t.get(FamilyTable.ID);
+            Family f2 = t.get(FAMILY_ALIAS_0);
+            System.out.print(f2.getFather().getName() + " is grandfather of ");
+            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.println();
+        });
+
+        // Query pairs (p1, p2) of all people where p1 is great grandfather of p2
+        System.out.println("\np1 == great grandson of p2");
+        TableID<Family> FAMILY_ALIAS_1 = TableID.createAlias();
+        HgDB.join(new JoinPredicate(
+                FamilyTable.as(FamilyTable.ID).on.father(),
+                FamilyTable.as(FAMILY_ALIAS_0).on.children(),
+                HgRelation.IN
+        ), new JoinPredicate(
+                FamilyTable.as(FAMILY_ALIAS_0).on.father(),
+                FamilyTable.as(FAMILY_ALIAS_1).on.children(),
+                HgRelation.IN
+        )).forEachRemaining(t -> {
+            Family f1 = t.get(FamilyTable.ID);
+            Family f2 = t.get(FAMILY_ALIAS_1);
+            System.out.print(f2.getFather().getName() + " is great grandfather of ");
+            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.println();
+        });
     }
 
     private static void buildSampleDatabase() {
