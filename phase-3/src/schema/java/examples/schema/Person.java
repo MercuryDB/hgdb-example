@@ -15,6 +15,8 @@ public class Person {
     private Date birthday;
     private boolean gender; // female is true, male is false
 
+    private Calendar calendar;
+
     public Person(Person person) {
         this(person.name, person.birthday, person.gender);
     }
@@ -27,6 +29,8 @@ public class Person {
             System.err.println("Invalid date! Must follow format of MM/dd/yyyy");
         }
         this.gender = gender;
+
+        this.calendar = Calendar.getInstance();
     }
 
     public Person(String name, Date birthday, boolean gender) {
@@ -36,7 +40,7 @@ public class Person {
     }
 
     public String toString() {
-        return String.format("{name=%s, birthday=%d, gender=%s}",
+        return String.format("{name=%s, birthday=%s, gender=%s}",
                 name, birthday, gender ? "female" : "male");
     }
 
@@ -53,11 +57,10 @@ public class Person {
     @HgValue(value="age", index= HgIndexStyle.ORDERED)
     public int getAge() {
         Date today = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(today);
-        int yearNow = cal.get(Calendar.YEAR);
-        cal.setTime(birthday);
-        int yearThen = cal.get(Calendar.YEAR);
+        calendar.setTime(today);
+        int yearNow = calendar.get(Calendar.YEAR);
+        calendar.setTime(birthday);
+        int yearThen = calendar.get(Calendar.YEAR);
         return yearNow - yearThen;
     }
 
