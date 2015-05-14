@@ -10,3 +10,10 @@ with each project directory.
 
 For the most detailed information about this tutorial, see the associated
 documentation.
+
+The `build.gradle.template` is a gradle build template that is used in each of the phases of the project.
+It can be used as a good template for any other projects as well, as it separates the application, schema, and
+database packages of the source code for the bootstrap process of MercuryDB to operate in an elegant way.
+
+If the template is updated, run `gradle pushBuildTemplate` from the root of the project to update the build
+files for each of the phases.
