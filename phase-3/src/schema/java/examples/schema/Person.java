@@ -4,39 +4,35 @@ import com.github.mercurydb.annotations.HgIndexStyle;
 import com.github.mercurydb.annotations.HgUpdate;
 import com.github.mercurydb.annotations.HgValue;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class Person {
     private String name;
-    private Date birthday;
+    private LocalDate birthday;
     private boolean gender; // female is true, male is false
 
-    private Calendar calendar;
+    private LocalDate today; // now = construction time (because letting this change dynamically is an issue)
 
-    public Person(Person person) {
-        this(person.name, person.birthday, person.gender);
-    }
-
-    public Person(String name, String birthday, boolean gender) {
-        this.name = name;
-        try {
-            this.birthday = new SimpleDateFormat("MM/dd/yyyy").parse(birthday);
-        } catch (ParseException e) {
-            System.err.println("Invalid date! Must follow format of MM/dd/yyyy");
-        }
-        this.gender = gender;
-
-        this.calendar = Calendar.getInstance();
-    }
-
-    public Person(String name, Date birthday, boolean gender) {
+    private void initialize(String name, LocalDate birthday, boolean gender) {
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
+        this.today = LocalDate.now();
+    }
+
+    public Person(String name, LocalDate birthday, boolean gender) {
+        initialize(name, birthday, gender);
+    }
+
+    public Person(Person person) {
+        initialize(person.name, person.birthday, person.gender);
+    }
+
+    public Person(String name, String birthday, boolean gender) {
+        LocalDate bday = LocalDate.parse(birthday, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        initialize(name, bday, gender);
     }
 
     public String toString() {
@@ -44,7 +40,7 @@ public class Person {
                 name, birthday, gender ? "female" : "male");
     }
 
-    @HgValue("name")
+    @HgValue(value = "name", index = HgIndexStyle.ORDERED)
     public String getName() {
         return name;
     }
@@ -54,18 +50,14 @@ public class Person {
         this.name = name;
     }
 
-    @HgValue(value="age", index= HgIndexStyle.ORDERED)
+    @HgValue(value = "age", index = HgIndexStyle.ORDERED)
     public int getAge() {
-        Date today = new Date();
-        calendar.setTime(today);
-        int yearNow = calendar.get(Calendar.YEAR);
-        calendar.setTime(birthday);
-        int yearThen = calendar.get(Calendar.YEAR);
-        return yearNow - yearThen;
+        long years = ChronoUnit.YEARS.between(birthday, today);
+        return (int) years;
     }
 
-    @HgValue("birthday")
-    public Date getBirthday() {
+    @HgValue(value = "birthday", index = HgIndexStyle.ORDERED)
+    public LocalDate getBirthday() {
         return birthday;
     }
 

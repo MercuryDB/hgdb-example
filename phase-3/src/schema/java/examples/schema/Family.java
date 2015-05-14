@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Family {
-
     private Person mother;
     private Person father;
     private List<Person> children;

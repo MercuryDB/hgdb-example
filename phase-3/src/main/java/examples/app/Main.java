@@ -1,15 +1,17 @@
 package examples.app;
 
-import com.github.mercurydb.queryutils.*;
-
-import examples.db.FamilyTable;
+import com.github.mercurydb.queryutils.HgDB;
+import com.github.mercurydb.queryutils.HgRelation;
+import com.github.mercurydb.queryutils.HgStream;
+import com.github.mercurydb.queryutils.TableID;
 import examples.db.PersonTable;
 import examples.schema.Department;
 import examples.schema.Family;
 import examples.schema.Person;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Calendar;
-import java.util.Date;
 
 public class Main {
 
@@ -61,24 +63,21 @@ public class Main {
                 PersonTable.as(PersonTable.ID).on.age(),
                 PersonTable.as(PERSON_ALIAS).on.age(),
                 HgRelation.LT)
-        .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
-        // Query all people with the same birthday
+        // Query all people with the same birthday month
         System.out.println("\np1.birthday.month == p2.birthday.month");
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
-        HgDB.join(new JoinPredicate(
+        HgDB.join(
                 PersonTable.on.birthday(),
                 PersonTable.as(PERSON_ALIAS).on.birthday(),
-                (Date d1, Date d2) -> {
-                    cal1.setTime(d1);
-                    int d1Month = cal1.get(Calendar.MONTH);
-                    cal2.setTime(d2);
-                    int d2Month = cal2.get(Calendar.MONTH);
+                (LocalDate d1, LocalDate d2) -> {
+                    Month d1Month = d1.getMonth();
+                    Month d2Month = d2.getMonth();
                     return d1Month == d2Month;
-                }
-        ))
-        .forEachRemaining(System.out::println);
+                })
+                .forEachRemaining(System.out::println);
 
         // Query pairs (p1, p2) of all people p1 is grandfather of p2
     }
