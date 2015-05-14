@@ -75,7 +75,7 @@ public class Main {
                 (LocalDate d1, LocalDate d2) -> {
                     Month d1Month = d1.getMonth();
                     Month d2Month = d2.getMonth();
-                    return d1Month == d2Month;
+                    return d1Month.equals(d2Month);
                 })
                 .forEachRemaining(System.out::println);
 
