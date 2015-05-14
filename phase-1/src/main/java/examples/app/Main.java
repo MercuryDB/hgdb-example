@@ -6,7 +6,7 @@ import com.github.mercurydb.queryutils.HgStream;
 import com.github.mercurydb.queryutils.TableID;
 
 import examples.schema.Person;
-import examples.db.PersonTable;
+import mailorder.db.PersonTable;
 
 public class Main {
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();

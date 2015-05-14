@@ -4,7 +4,7 @@ import com.github.mercurydb.queryutils.HgDB;
 import com.github.mercurydb.queryutils.HgRelation;
 import com.github.mercurydb.queryutils.HgStream;
 import com.github.mercurydb.queryutils.TableID;
-import examples.db.PersonTable;
+import mailorder.db.PersonTable;
 import examples.schema.Department;
 import examples.schema.Family;
 import examples.schema.Person;

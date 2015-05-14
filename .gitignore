@@ -12,3 +12,10 @@ db/
 *.swp
 *~
 ~*
+
+# javadoc-generated
+*.html
+*.js
+*.css
+package-list
+docs/

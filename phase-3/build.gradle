@@ -21,7 +21,7 @@ project.ext.set('hgDbPackage', 'examples.db')
 project.ext.set('hgAppPackage', 'examples.app')
 
 apply plugin: 'application'
-mainClassName = "examples.app.Main"
+mainClassName = "Main"
 
 repositories {
     mavenCentral()

@@ -5,7 +5,7 @@ import com.github.mercurydb.queryutils.HgRelation;
 import com.github.mercurydb.queryutils.HgStream;
 import com.github.mercurydb.queryutils.TableID;
 
-import examples.db.PersonTable;
+import mailorder.db.PersonTable;
 import examples.schema.Person;
 
 public class Main {
