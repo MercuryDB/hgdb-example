@@ -1,0 +1,91 @@
+/*
+ * Default MercuryDB example build. Feel free to reuse this
+ * for other projects. It should be as simple as changing the below
+ * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
+ *
+ * This build file contains 3 Gradle source sets.
+ *  - main (app)
+ *  - db
+ *  - schema
+ *
+ * The main source set contains the app code.
+ * The main package is examples.app (project.hgAppPackage)
+ * The schema source set contains the database schema.
+ * The schema package is examples.schema (project.hgSchemaPackage)
+ * The db source set contains the generated tables from the schema.
+ * The db package is examples.db (project.hgDbPackage)
+ */
+
+project.ext.set('hgSchemaPackage', 'examples.schema')
+project.ext.set('hgDbPackage', 'examples.db')
+project.ext.set('hgAppPackage', 'examples.app')
+
+apply plugin: 'application'
+mainClassName = "examples.app.Main"
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'com.github.mercurydb:mercurydb:0.6.3-SNAPSHOT'
+}
+
+sourceSets {
+    schema {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.compileClasspath
+    }
+    db {
+        compileClasspath += main.compileClasspath
+        compileClasspath += schema.output 
+    }
+    main {
+        compileClasspath += schema.output
+        compileClasspath += db.output
+    }
+}
+
+configurations {
+    schemaCompile.extendsFrom mainCompile
+    dbCompile.extendsFrom mainCompile
+}
+
+project.run.classpath += sourceSets.schema.output
+project.run.classpath += sourceSets.db.output
+
+task clearDB(type: Delete) {
+    delete 'src/db/java/' + hgDbPackage.replace('.', '/')
+}
+
+task generateTables(type: JavaExec) {
+    classpath = sourceSets.schema.runtimeClasspath
+    main = 'com.github.mercurydb.Main'
+    args = [
+        '-src', project.hgSchemaPackage,
+        '-db', project.hgDbPackage,
+        '-root', 'src/schema/java',
+        '-dbdir', 'src/db/java'
+    ]
+}
+
+task insertHooks(type: JavaExec) {
+    classpath = sourceSets.main.compileClasspath
+    main = 'com.github.mercurydb.Main'
+    args = [
+        '-src', project.hgSchemaPackage,
+        '-db', project.hgDbPackage,
+        '-root', 'src/schema/java',
+        '-ih', sourceSets.schema.output.classesDir
+    ]
+}
+
+// Gradle Graph for tasks below
+generateTables.dependsOn compileSchemaJava
+compileDbJava.dependsOn generateTables
+insertHooks.dependsOn compileDbJava
+compileJava.dependsOn insertHooks
+clean.dependsOn clearDB

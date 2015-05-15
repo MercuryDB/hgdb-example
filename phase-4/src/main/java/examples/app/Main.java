@@ -1,17 +1,14 @@
 package examples.app;
 
 import com.github.mercurydb.queryutils.*;
-import examples.db.FamilyEventTable;
 import examples.db.FamilyTable;
 import examples.db.PersonTable;
+import examples.schema.Department;
 import examples.schema.Family;
-import examples.schema.FamilyEvent;
 import examples.schema.Person;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 public class Main {
 
@@ -36,62 +33,28 @@ public class Main {
         //  Query all people with ages >= 21
         System.out.println("\nages >= 1:");
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
-        stream.forEach(System.out::println);
+        stream.forEachRemaining(System.out::println);
 
         //  Query all people with first names that begin with a letter after I
         System.out.println("\nname >= 'I':");
         HgDB.query(PersonTable.ge.name("I"))
-                .forEach(System.out::println);
+                .forEachRemaining(System.out::println);
 
         // Query all people that are male and less than 23
         System.out.println("\nmale and age < 23:");
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.lt.age(23)
-        ).forEach(System.out::println);
+        ).forEachRemaining(System.out::println);
 
         // Query all people whose age is divisible by 2
         System.out.println("\nage % 2 == 0:");
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
-                .forEach(System.out::println);
+                .forEachRemaining(System.out::println);
 
-        // Query all families with >= 3 children
-        System.out.println("\nfamilies with >= 3 children:");
-        HgDB.query(FamilyTable.predicate(f -> f.getChildren().size() >= 3))
-                .forEach(System.out::println);
-
-        // Query all family events in the 1990's
-        System.out.println("\nfamily events in the 1990's:");
-        LocalDate firstOf1990 = LocalDate.of(1990, 1, 1);
-        LocalDate firstOf2000 = LocalDate.of(2000, 1, 1);
-        HgDB.query(
-                FamilyEventTable.ge.date(firstOf1990),
-                FamilyEventTable.lt.date(firstOf2000)
-        ).forEach(System.out::println);
-
-        // =================
-        // Multi-Table Joins
-        // =================
-
-        System.out.println("\nPeople born on the same day as an event:");
-        HgDB.join(
-                PersonTable.on.birthday(),
-                FamilyEventTable.on.date()
-        ).forEach(System.out::println);
-
-        System.out.println("\nPeople that were teenagers during an event");
-        HgDB.join(
-                PersonTable.on.birthday(),
-                FamilyEventTable.on.date(),
-                (LocalDate d1, LocalDate d2) -> {
-                    long diff = ChronoUnit.YEARS.between(d1, d2);
-                    return diff < 20 && diff > 10;
-                }
-        ).forEach(tuple -> {
-            Person p = tuple.get(PersonTable.ID);
-            FamilyEvent fe = tuple.get(FamilyEventTable.ID);
-            System.out.println(p.getName() + " (" + p.getAge() + ")" + " | " + fe);
-        });
+        // Query all families with more than 3 children
+        HgDB.query(FamilyTable.predicate(f -> f.getChildren().size() > 3))
+                .forEachRemaining(System.out::println);
 
 
         // ==========
@@ -102,18 +65,24 @@ public class Main {
         //
         // note: referencing the PersonTable.ID here is redundant. The statement
         //       could have also been written as PersonTable.on.age()
+        System.out.println("\np1.age < p2.age:");
+        HgDB.join(
+                PersonTable.as(PersonTable.ID).on.age(),
+                PersonTable.as(PERSON_ALIAS).on.age(),
+                HgRelation.LT
+        ).forEachRemaining(System.out::println);
 
         // Query all people with the same birthday month
         System.out.println("\np1.birthday.month == p2.birthday.month");
         HgDB.join(
-                PersonTable.as(PersonTable.ID).on.birthday(),
+                PersonTable.on.birthday(),
                 PersonTable.as(PERSON_ALIAS).on.birthday(),
                 (LocalDate d1, LocalDate d2) -> {
                     Month d1Month = d1.getMonth();
                     Month d2Month = d2.getMonth();
                     return d1Month.equals(d2Month);
                 }
-        ).forEach(System.out::println);
+        ).forEachRemaining(System.out::println);
 
         // Query pairs (p1, p2) of all people p1 is grandfather of p2
         System.out.println("\np1 == grandson of p2");
@@ -121,7 +90,7 @@ public class Main {
                 FamilyTable.as(FamilyTable.ID).on.father(),
                 FamilyTable.as(FAMILY_ALIAS_0).on.children(),
                 HgRelation.IN
-        ).forEach(t -> {
+        ).forEachRemaining(t -> {
             Family f1 = t.get(FamilyTable.ID);
             Family f2 = t.get(FAMILY_ALIAS_0);
             System.out.print(f2.getFather().getName() + " is grandfather of ");
@@ -142,7 +111,7 @@ public class Main {
                         FamilyTable.as(FAMILY_ALIAS_1).on.children(),
                         HgRelation.IN
                 )
-        ).forEach(t -> {
+        ).forEachRemaining(t -> {
             Family f1 = t.get(FamilyTable.ID);
             Family f2 = t.get(FAMILY_ALIAS_1);
             System.out.print(f2.getFather().getName() + " is great grandfather of ");
@@ -162,46 +131,37 @@ public class Main {
         Person kimDoe = new Person("Kim Doe", "11/02/1960", false);
         Person jessDoe = new Person("Jess Doe", "09/03/1962", true);
         Person jonDoe = new Person("Jon Doe", "09/26/1958", false);
-        Family doe1 = new Family(rhianneDoe, johnDoe, kimDoe, jessDoe, jonDoe);
+        new Family(rhianneDoe, johnDoe, kimDoe, jessDoe, jonDoe);
 
         // the Marven family
         Person blakeMarven = new Person("Blake Marven", "01/13/1947", false); // parent
         Person ashMarven = new Person("Ash Marven", "02/01/1948", true);  // parent
         Person capMarven = new Person("Cap Marven", "05/05/1960", false);
-        Family marven1 = new Family(ashMarven, blakeMarven, capMarven);
+        new Family(ashMarven, blakeMarven, capMarven);
 
         // the Stuart family
         Person steveStuart = new Person("Steve Stuart", "07/03/1940", false);  // parent
         Person christyStuart = new Person("Christy Stuart", "08/09/1943", true);  // parent
         Person jimStuart = new Person("Jim Stuart", "01/30/1963", false);
         Person alleyStuart = new Person("Alley Stuart", "02/15/1967", true);
-        Family stuart1 = new Family(christyStuart, steveStuart, jimStuart);
+        new Family(christyStuart, steveStuart, jimStuart);
 
         // 2nd generation families
         // another Marven family
         Person carrieMarven = new Person("Carrie Marven", "05/28/1980", true);
-        Family marven2 = new Family(jessDoe, capMarven, carrieMarven);
+        new Family(jessDoe, capMarven, carrieMarven);
 
         // another Stuart family
         Person loganStuart = new Person("Logan Stuart", "04/22/1984", false);
         Person willStuart = new Person("Will Stuart", "10/10/1988", false);
-        Family stuart2 = new Family(kimDoe, jimStuart, loganStuart, willStuart);
+        new Family(kimDoe, jimStuart, loganStuart, willStuart);
 
         // another Doe family
         Person kaylaDoe = new Person("Kayla Doe", "09/26/1984", true);
-        Family doe2 = new Family(ashMarven, jonDoe, kaylaDoe);
+        new Family(ashMarven, jonDoe, kaylaDoe);
 
         // 3rd generation families
         Person mathewStuart = new Person("Mathew Stuart", "12/12/2000", false);
-        Family stuart3 = new Family(carrieMarven, loganStuart, mathewStuart);
-
-        // Now we setup the FamilyEvents
-        new FamilyEvent(marven2, "04/04/1980", "It's a girl! We'll name her Carrie.");
-        new FamilyEvent(marven2, "05/28/1980", "Carrie's born!");
-        new FamilyEvent(stuart2, "01/20/1994", "Bought Will his first computer. He's so smart!");
-        new FamilyEvent(stuart2, "01/23/1994", "Will poured milk on the computer. It's ruined.");
-        new FamilyEvent(stuart2, "11/25/1995", "Bought a family computer");
-        new FamilyEvent(doe1, "11/19/1969", "Apollo 11 to the moon!");
-        new FamilyEvent(stuart2, "11/26/1998", "Played DDR with the boys.");
+        new Family(carrieMarven, loganStuart, mathewStuart);
     }
 }

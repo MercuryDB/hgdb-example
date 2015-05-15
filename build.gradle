@@ -12,7 +12,7 @@ def filesToCopy = copySpec {
 }
 
 task pushBuildTemplate(type: Copy) {
-    ['phase-blank', 'phase-0', 'phase-1', 'phase-2', 'phase-3'].each { dest ->
+    ['phase-blank', 'phase-0', 'phase-1', 'phase-2', 'phase-3', 'phase-4'].each { dest ->
         copy {
             with filesToCopy
             into dest
