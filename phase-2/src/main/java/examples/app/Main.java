@@ -4,12 +4,10 @@ import com.github.mercurydb.queryutils.HgDB;
 import com.github.mercurydb.queryutils.HgRelation;
 import com.github.mercurydb.queryutils.HgStream;
 import com.github.mercurydb.queryutils.TableID;
-
 import examples.db.PersonTable;
 import examples.schema.Person;
 
 public class Main {
-
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();
 
     public static void main(String[] args) {
@@ -23,7 +21,7 @@ public class Main {
                 new Person("Doug Ilijev", 24, false),
         };
 
-        System.out.println("The Database:");
+        System.out.println("\nThe Database:");
         PersonTable.stream().forEach(System.out::println);
 
         // ===========================
@@ -31,7 +29,7 @@ public class Main {
         // ===========================
 
         //  Query all people with ages >= 21
-        System.out.println("\nages >= 1:");
+        System.out.println("\nages >= 21:");
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
         stream.forEachRemaining(System.out::println);
 
@@ -51,7 +49,6 @@ public class Main {
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
                 .forEachRemaining(System.out::println);
 
-
         // ==========
         // Self Joins
         // ==========
@@ -65,6 +62,18 @@ public class Main {
                 PersonTable.as(PersonTable.ID).on.age(),
                 PersonTable.as(PERSON_ALIAS).on.age(),
                 HgRelation.LT)
-        .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
+
+        // Great! Everybody had a birthday recently!
+        for (Person p : people) {
+            p.setAge(p.getAge() + 1);
+        }
+
+        // Query all people that are male and less than 23
+        System.out.println("\nmale and age < 23:");
+        HgDB.query(
+                PersonTable.eq.gender(Person.Gender.MALE),
+                PersonTable.lt.age(24))
+                .forEachRemaining(System.out::println);
     }
 }

@@ -4,9 +4,8 @@ import com.github.mercurydb.queryutils.HgDB;
 import com.github.mercurydb.queryutils.HgRelation;
 import com.github.mercurydb.queryutils.HgStream;
 import com.github.mercurydb.queryutils.TableID;
-
-import examples.schema.Person;
 import examples.db.PersonTable;
+import examples.schema.Person;
 
 public class Main {
     public static final TableID<Person> PERSON_ALIAS = PersonTable.createAlias();
@@ -43,12 +42,12 @@ public class Main {
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.lt.age(23))
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
         // Query all people whose age is divisible by 2
         System.out.println("\nage % 2 == 0:");
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
         // ==========
         // Self Joins
@@ -63,11 +62,11 @@ public class Main {
                 PersonTable.as(PersonTable.ID).on.age(),
                 PersonTable.as(PERSON_ALIAS).on.age(),
                 HgRelation.LT)
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
 
         // Great! Everybody had a birthday recently!
         for (Person p : people) {
-            p.setAge(p.getAge()+1);
+            p.setAge(p.getAge() + 1);
         }
 
         // Query all people that are male and less than 23
@@ -75,6 +74,6 @@ public class Main {
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.lt.age(24))
-            .forEachRemaining(System.out::println);
+                .forEachRemaining(System.out::println);
     }
 }
