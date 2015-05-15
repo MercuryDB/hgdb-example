@@ -27,12 +27,12 @@ public class Main {
         // Single Table Filter Queries
         // ===========================
 
-        //  Query all people with ages >= 21
+        // Query all people with ages >= 21
         System.out.println("\nages >= 21:");
         HgStream<Person> stream = HgDB.query(PersonTable.ge.age(21));
         stream.forEach(System.out::println);
 
-        //  Query all people with first names that begin with a letter after I
+        // Query all people with first names that begin with a letter after I
         System.out.println("\nname >= 'I':");
         HgDB.query(PersonTable.ge.name("I")).forEach(System.out::println);
 
@@ -43,11 +43,25 @@ public class Main {
                 PersonTable.lt.age(24))
                 .forEach(System.out::println);
 
+        // To show the difference between LT and LE:
         // Query all people that are male and less than or equal to 24
         System.out.println("\nmale and age <= 24:");
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
                 PersonTable.le.age(24))
+                .forEach(System.out::println);
+
+        // Query a range of values
+        System.out.println("\nage between 18 and 21 inclusive");
+        HgDB.query(
+                PersonTable.ge.age(18),
+                PersonTable.le.age(21))
+                .forEach(System.out::println);
+
+        // Query a disjunction of predicates
+        System.out.println("\nage < 18 or >= 21");
+        HgDB.query(PersonTable.lt.age(18))
+                .concat(HgDB.query(PersonTable.gt.age(21)))
                 .forEach(System.out::println);
 
         // Query all people whose age is divisible by 2
