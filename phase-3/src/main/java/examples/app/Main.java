@@ -12,6 +12,11 @@ import java.time.Month;
 
 public class Main {
 
+    /**
+     * We create Aliases to be used in joins here. Note that we cannot use createAlias() here. See
+     * the documentation for TableID to understand why. Static ID's must be permanent names, and
+     * temporary aliases must be aliases.
+     */
     public static final TableID<Person> PERSON_ALIAS = TableID.createName();
     public static final TableID<Family> FAMILY_ALIAS_0 = TableID.createName();
 
@@ -32,18 +37,23 @@ public class Main {
 
         //  Query all people with first names that begin with a letter after I
         System.out.println("\nname >= 'I':");
-        HgDB.query(PersonTable.ge.name("I")).forEachRemaining(System.out::println);
+        HgDB.query(PersonTable.ge.name("I"))
+                .forEachRemaining(System.out::println);
 
         // Query all people that are male and less than 23
         System.out.println("\nmale and age < 23:");
         HgDB.query(
                 PersonTable.eq.gender(Person.Gender.MALE),
-                PersonTable.lt.age(23))
-                .forEachRemaining(System.out::println);
+                PersonTable.lt.age(23)
+        ).forEachRemaining(System.out::println);
 
         // Query all people whose age is divisible by 2
         System.out.println("\nage % 2 == 0:");
         HgDB.query(PersonTable.predicate(p -> p.getAge() % 2 == 0))
+                .forEachRemaining(System.out::println);
+
+        // Query all families with more than 3 children
+        HgDB.query(FamilyTable.predicate(f -> f.getChildren().size() > 3))
                 .forEachRemaining(System.out::println);
 
 
@@ -59,8 +69,8 @@ public class Main {
         HgDB.join(
                 PersonTable.as(PersonTable.ID).on.age(),
                 PersonTable.as(PERSON_ALIAS).on.age(),
-                HgRelation.LT)
-                .forEachRemaining(System.out::println);
+                HgRelation.LT
+        ).forEachRemaining(System.out::println);
 
         // Query all people with the same birthday month
         System.out.println("\np1.birthday.month == p2.birthday.month");
@@ -71,8 +81,8 @@ public class Main {
                     Month d1Month = d1.getMonth();
                     Month d2Month = d2.getMonth();
                     return d1Month.equals(d2Month);
-                })
-                .forEachRemaining(System.out::println);
+                }
+        ).forEachRemaining(System.out::println);
 
         // Query pairs (p1, p2) of all people p1 is grandfather of p2
         System.out.println("\np1 == grandson of p2");
@@ -91,15 +101,17 @@ public class Main {
         // Query pairs (p1, p2) of all people where p1 is great grandfather of p2
         System.out.println("\np1 == great grandson of p2");
         TableID<Family> FAMILY_ALIAS_1 = TableID.createAlias();
-        HgDB.join(new JoinPredicate(
-                FamilyTable.as(FamilyTable.ID).on.father(),
-                FamilyTable.as(FAMILY_ALIAS_0).on.children(),
-                HgRelation.IN
-        ), new JoinPredicate(
-                FamilyTable.as(FAMILY_ALIAS_0).on.father(),
-                FamilyTable.as(FAMILY_ALIAS_1).on.children(),
-                HgRelation.IN
-        )).forEachRemaining(t -> {
+        HgDB.join(
+                new JoinPredicate(
+                        FamilyTable.as(FamilyTable.ID).on.father(),
+                        FamilyTable.as(FAMILY_ALIAS_0).on.children(),
+                        HgRelation.IN),
+                new JoinPredicate(
+                        FamilyTable.as(FAMILY_ALIAS_0).on.father(),
+                        FamilyTable.as(FAMILY_ALIAS_1).on.children(),
+                        HgRelation.IN
+                )
+        ).forEachRemaining(t -> {
             Family f1 = t.get(FamilyTable.ID);
             Family f2 = t.get(FAMILY_ALIAS_1);
             System.out.print(f2.getFather().getName() + " is great grandfather of ");
@@ -111,14 +123,6 @@ public class Main {
     private static void buildSampleDatabase() {
         // Our nice little database. The constructor bytecode hooks will insert the
         // people into the database!
-
-        Department[] departments = {
-                new Department("groceries"),
-                new Department("plants"),
-                new Department("automotive"),
-                new Department("toys"),
-                new Department("electronics")
-        };
 
         // 1st generation families
         // the Doe family

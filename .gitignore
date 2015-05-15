@@ -12,3 +12,5 @@ db/
 *.swp
 *~
 ~*
+gradlew*
+gradle
