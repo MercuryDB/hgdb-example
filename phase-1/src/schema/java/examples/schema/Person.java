@@ -44,7 +44,7 @@ public class Person {
 
     @HgValue(value = "gender", index = HgIndexStyle.UNORDERED)
     public Gender getGender() {
-       return gender;
+        return gender;
     }
 
     // declare all @HgUpdates after @HgValues so they are grouped together
