@@ -1,28 +1,41 @@
-/*
- * Default MercuryDB example build. Feel free to reuse this
+/**
+ * README - How to understand and edit this file
+ *
+ * This is the default MercuryDB example build. Feel free to reuse this
  * for other projects. It should be as simple as changing the below
- * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names.
+ * variables 'hgSchemaPackage' and 'hgDbPackage' to the correct package names,
+ * and updating the 'mainClassName'.
  *
  * This build file contains 3 Gradle source sets.
- *  - main (app)
- *  - db
  *  - schema
+ *  - db [generated from schema]
+ *  - main (application)
  *
- * The main source set contains the app code.
- * The main package is examples.app (project.hgAppPackage)
  * The schema source set contains the database schema.
- * The schema package is examples.schema (project.hgSchemaPackage)
+ * The schema source code is rooted at "./src/schema/java"
+ * The schema package is 'examples.schema' (project.hgSchemaPackage)
+ *
  * The db source set contains the generated tables from the schema.
- * The db package is examples.db (project.hgDbPackage)
+ * The db source code will be rooted at "./src/db/java"
+ * The db source set should contain NO HANDWRITTEN CODE.
+ * The db package is 'examples.db' (project.hgDbPackage)
+ *
+ * The main source set contains the application code.
+ * The main source code is rooted at "./src/main/java"
+ * The main package is 'examples.app' (project.hgAppPackage)
  */
 
+// TODO update these lines to reflect the names of your packages
 project.ext.set('hgSchemaPackage', 'examples.schema')
 project.ext.set('hgDbPackage', 'examples.db')
 project.ext.set('hgAppPackage', 'examples.app')
 
 apply plugin: 'application'
+
+// TODO set the fully-qualified class name of the class containing the main() method
 mainClassName = "examples.app.Main"
 
+// tell Gradle which Maven repository in which to find the MercuryDB dependency
 repositories {
     mavenCentral()
     maven {
@@ -30,24 +43,31 @@ repositories {
     }
 }
 
+// list all the dependencies for this project, as in a Maven project (groupid:artifact:version)
 dependencies {
+    // list the artifact name for the MercuryDB dependency
     compile 'com.github.mercurydb:mercurydb:0.6.3-SNAPSHOT'
 }
 
+// defines the source sets, which are mapped to subdirectories of the src/ directory
 sourceSets {
-    schema {
+    schema { // rooted in "./src/schema" directory
         compileClasspath += main.compileClasspath
         runtimeClasspath += main.compileClasspath
     }
-    db {
+    db { // rooted in "./src/db" directory [generated]
         compileClasspath += main.compileClasspath
-        compileClasspath += schema.output 
+        compileClasspath += schema.output
     }
-    main {
+    main { // rooted in "./src/main" directory
         compileClasspath += schema.output
         compileClasspath += db.output
     }
 }
+
+// ---------------------------------------------
+// below this line is setting up the build tasks
+// ---------------------------------------------
 
 configurations {
     schemaCompile.extendsFrom mainCompile
