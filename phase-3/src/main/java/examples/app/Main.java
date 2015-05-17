@@ -1,7 +1,7 @@
 package examples.app;
 
 import com.github.mercurydb.queryutils.*;
-import com.github.mercurydb.queryutils.graph.HgClosureGraph;
+import com.github.mercurydb.queryutils.graph.HgQueryGraph;
 import examples.db.*;
 import examples.schema.FamilyRelation;
 import examples.schema.FamilyEvent;
@@ -11,6 +11,8 @@ import examples.schema.Person;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -21,6 +23,8 @@ public class Main {
      */
     public static final TableID<Person> PERSON_ALIAS = TableID.createName();
     public static final TableID<FamilyRelation> FAMILY_ALIAS_0 = TableID.createName();
+    public static final TableID<FamilyRelation> FAMILY_ALIAS_1 = TableID.createName();
+    public static final TableID<FamilyRelation> FAMILY_ALIAS_2 = TableID.createName();
 
     public static void main(String[] args) {
         buildSampleDatabase();
@@ -28,9 +32,17 @@ public class Main {
         System.out.println("The Database:");
         PersonTable.stream().forEach(System.out::println);
 
+        performSingleTableQueries();
+        performSelfJoins();
+        performMultiJoins();
+        performGraphQueries();
+    }
+
+    private static void performSingleTableQueries() {
         // ===========================
         // Single Table Filter Queries
         // ===========================
+        System.out.println("\n*** Single Table Queries ***");
 
         //  Query all people with ages >= 21
         System.out.println("\nages >= 1:");
@@ -67,10 +79,67 @@ public class Main {
                 FamilyEventTable.ge.date(firstOf1990),
                 FamilyEventTable.lt.date(firstOf2000)
         ).forEach(System.out::println);
+    }
 
+    private static void performSelfJoins() {
+        // ==========
+        // Self Joins
+        // ==========
+        System.out.println("\n*** Self Join Queries ***");
+
+        // Query pairs (p1, p2) where p1.birthday.month == p2.birthday.month
+        System.out.println("\np1.birthday.month == p2.birthday.month");
+        HgDB.join(
+                PersonTable.as(PersonTable.ID).on.birthday(),
+                PersonTable.as(PERSON_ALIAS).on.birthday(),
+                (LocalDate d1, LocalDate d2) -> {
+                    Month d1Month = d1.getMonth();
+                    Month d2Month = d2.getMonth();
+                    return d1Month.equals(d2Month);
+                }
+        ).forEach(System.out::println);
+
+        // Query pairs (p1, p2) of all people p1 is grandfather of p2
+        System.out.println("\np1 == grandson of p2");
+        HgDB.join(
+                FamilyRelationTable.as(FAMILY_ALIAS_0).on.father(),
+                FamilyRelationTable.as(FAMILY_ALIAS_1).on.children(),
+                HgRelation.IN
+        ).forEach(t -> {
+            FamilyRelation f1 = t.get(FAMILY_ALIAS_0);
+            FamilyRelation f2 = t.get(FAMILY_ALIAS_1);
+            System.out.print(f2.getFather().getName() + " is grandfather of ");
+            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.println();
+        });
+
+        // Query pairs (p1, p2) of all people where p1 is great grandfather of p2
+        System.out.println("\np1 == great grandson of p2");
+        TableID<FamilyRelation> FAMILY_ALIAS_1 = TableID.createAlias();
+        HgDB.join(
+                new JoinPredicate(
+                        FamilyRelationTable.as(FAMILY_ALIAS_0).on.father(),
+                        FamilyRelationTable.as(FAMILY_ALIAS_1).on.children(),
+                        HgRelation.IN),
+                new JoinPredicate(
+                        FamilyRelationTable.as(FAMILY_ALIAS_1).on.father(),
+                        FamilyRelationTable.as(FAMILY_ALIAS_2).on.children(),
+                        HgRelation.IN
+                )
+        ).forEach(t -> {
+            FamilyRelation f1 = t.get(FAMILY_ALIAS_0);
+            FamilyRelation f2 = t.get(FAMILY_ALIAS_2);
+            System.out.print(f2.getFather().getName() + " is great grandfather of ");
+            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.println();
+        });
+    }
+
+    private static void performMultiJoins() {
         // =================
         // Multi-Table Joins
         // =================
+        System.out.println("\n*** Multi-Table Join Queries ***");
 
         System.out.println("\nPeople born on the same day as an event:");
         HgDB.join(
@@ -92,27 +161,6 @@ public class Main {
             System.out.println(p.getName() + " (" + p.getAge() + ")" + " | " + fe);
         });
 
-        // ==========
-        // Self Joins
-        // ==========
-
-        // Query pairs (p1, p2) of all people where age of p1 < age of p2
-        //
-        // note: referencing the PersonTable.ID here is redundant. The statement
-        //       could have also been written as PersonTable.on.age()
-
-        // Query all people with the same birthday month
-        System.out.println("\np1.birthday.month == p2.birthday.month");
-        HgDB.join(
-                PersonTable.as(PersonTable.ID).on.birthday(),
-                PersonTable.as(PERSON_ALIAS).on.birthday(),
-                (LocalDate d1, LocalDate d2) -> {
-                    Month d1Month = d1.getMonth();
-                    Month d2Month = d2.getMonth();
-                    return d1Month.equals(d2Month);
-                }
-        ).forEach(System.out::println);
-
         // Query all people who have friends whose parents are also friends
         System.out.println("\nAll people who have friends whose parents are also friends");
         TableID<FriendRelation> friendId1 = TableID.createAlias();
@@ -130,53 +178,48 @@ public class Main {
                         FamilyRelationTable.as(familyId1).on.father(),
                         FriendRelationTable.as(friendId3).on.friends(), HgRelation.IN)
         ).forEach(System.out::println);
+    }
 
-        System.out.println("\nFAMILY TRANSITIVE CLOSURE");
-        HgClosureGraph graph = new HgClosureGraph(
-                FamilyRelationTable.as(FamilyRelationTable.ID).on.father(),
-                FamilyRelationTable.as(FAMILY_ALIAS_0).on.children(),
-                HgRelation.IN);
+    private static void performGraphQueries() {
+        // ===================
+        // Graph Queries/Joins
+        // ===================
+        System.out.println("\n*** Graph Queries ***");
 
-        HgDB.join(graph.transitiveClosurePredicate()).forEach(t -> {
-            FamilyRelation f1 = t.get(FamilyRelationTable.ID);
-            FamilyRelation f2 = t.get(FAMILY_ALIAS_0);
-            System.out.print(f2.getFather().getName() + " is ascendant of ");
-            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
-            System.out.println();
-        });
-
-        // Query pairs (p1, p2) of all people p1 is grandfather of p2
-        System.out.println("\np1 == grandson of p2");
-        HgDB.join(
-                FamilyRelationTable.as(FamilyRelationTable.ID).on.father(),
-                FamilyRelationTable.as(FAMILY_ALIAS_0).on.children(),
-                HgRelation.IN
-        ).forEach(t -> {
-            FamilyRelation f1 = t.get(FamilyRelationTable.ID);
-            FamilyRelation f2 = t.get(FAMILY_ALIAS_0);
-            System.out.print(f2.getFather().getName() + " is grandfather of ");
-            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
-            System.out.println();
-        });
-
-        // Query pairs (p1, p2) of all people where p1 is great grandfather of p2
-        System.out.println("\np1 == great grandson of p2");
-        TableID<FamilyRelation> FAMILY_ALIAS_1 = TableID.createAlias();
-        HgDB.join(
-                new JoinPredicate(
-                        FamilyRelationTable.as(FamilyRelationTable.ID).on.father(),
-                        FamilyRelationTable.as(FAMILY_ALIAS_0).on.children(),
-                        HgRelation.IN),
-                new JoinPredicate(
-                        FamilyRelationTable.as(FAMILY_ALIAS_0).on.father(),
+        // First we build the graph up
+        // we want to form nodes between two families f1 and f2 where f2.children
+        // contains the mother or father of f1. This means f2 in some way came as a result of f1.
+        HgQueryGraph<FamilyRelation> graph = new HgQueryGraph(
+                HgDB.join(
+                        FamilyRelationTable.as(FAMILY_ALIAS_0).onReference(),
                         FamilyRelationTable.as(FAMILY_ALIAS_1).on.children(),
-                        HgRelation.IN
-                )
-        ).forEach(t -> {
-            FamilyRelation f1 = t.get(FamilyRelationTable.ID);
+                        (FamilyRelation f1, List<Person> children) ->
+                                children.contains(f1.getMother()) || children.contains(f1.getFather())),
+                FamilyRelationTable.reference(FAMILY_ALIAS_1),  // source key for nodes in graph
+                FamilyRelationTable.reference(FAMILY_ALIAS_0)); // target key for nodes in graph
+
+        // We can use the graph as a reachability predicate for a join
+        System.out.println("\np1 is ascendant of p2");
+        HgDB.join(
+                FamilyRelationTable.as(FAMILY_ALIAS_0).onReference(),
+                FamilyRelationTable.as(FAMILY_ALIAS_1).onReference(),
+                graph.reachabilityPredicate()).forEach(t -> {
+            FamilyRelation f1 = t.get(FAMILY_ALIAS_0);
             FamilyRelation f2 = t.get(FAMILY_ALIAS_1);
-            System.out.print(f2.getFather().getName() + " is great grandfather of ");
-            f1.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.print(f1.getFather().getName() + " is ascendant of ");
+            f2.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            System.out.println();
+        });
+
+        // and we can query the graph for all descendants directly
+        System.out.println("\np1 is ascendant of p2");
+        FamilyRelationTable.stream().forEach(f -> {
+            System.out.print(f.getFather().getName() + ", " + f.getMother().getName() + " is ascendant of ");
+
+            // query graph starting from family
+            graph.breadthFirstFrom(f).forEach(fSub -> {
+                fSub.getChildren().forEach(child -> System.out.print(child.getName() + ", "));
+            });
             System.out.println();
         });
     }
