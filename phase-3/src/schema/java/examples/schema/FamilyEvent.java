@@ -6,18 +6,18 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class FamilyEvent {
-    private Family family;
+    private FamilyRelation family;
     private LocalDate dateOfOccurrence;
     private String description;
 
-    public FamilyEvent(Family family, String dateOfOccurrence, String description) {
+    public FamilyEvent(FamilyRelation family, String dateOfOccurrence, String description) {
         this.family = family;
         this.description = description;
         this.dateOfOccurrence = LocalDate.parse(dateOfOccurrence, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     }
 
     @HgValue("family")
-    public Family getAssociatedFamily() {
+    public FamilyRelation getAssociatedFamily() {
         return family;
     }
 
