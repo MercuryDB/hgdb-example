@@ -172,11 +172,17 @@ public class Main {
                         FriendRelationTable.as(friendId1).on.person(),
                         FamilyRelationTable.as(familyId1).on.children(), HgRelation.IN),
                 new JoinPredicate(
-                        FamilyRelationTable.as(familyId1).on.father(),
-                        FriendRelationTable.as(friendId2).on.person()),
+                        FamilyRelationTable.as(familyId1).onReference(),
+                        FriendRelationTable.as(friendId2).on.person(),
+                        (FamilyRelation family, FriendRelation friend) ->
+                                family.getMother().equals(friend.getPerson())
+                                        || family.getFather().equals(friend.getPerson())),
                 new JoinPredicate(
-                        FamilyRelationTable.as(familyId1).on.father(),
-                        FriendRelationTable.as(friendId3).on.friends(), HgRelation.IN)
+                        FamilyRelationTable.as(familyId1).onReference(),
+                        FriendRelationTable.as(friendId3).on.friends(),
+                        (FamilyRelation family, FriendRelation friend) ->
+                                friend.getFriends().contains(family.getMother()) ||
+                                        friend.getFriends().contains(family.getFather()))
         ).forEach(System.out::println);
     }
 

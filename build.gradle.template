@@ -38,15 +38,17 @@ mainClassName = "examples.app.Main"
 // tell Gradle which Maven repository in which to find the MercuryDB dependency
 repositories {
     mavenCentral()
-    maven {
-        url 'http://oss.sonatype.org/content/repositories/snapshots'
-    }
+
+// uncomment for latest snapshot version
+//    maven {
+//        url 'http://oss.sonatype.org/content/repositories/snapshots'
+//    }
 }
 
 // list all the dependencies for this project, as in a Maven project (groupid:artifact:version)
 dependencies {
     // list the artifact name for the MercuryDB dependency
-    compile 'com.github.mercurydb:mercurydb:0.6.3-SNAPSHOT'
+    compile 'com.github.mercurydb:mercurydb:0.6.3'
 }
 
 // defines the source sets, which are mapped to subdirectories of the src/ directory
